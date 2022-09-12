@@ -2,8 +2,15 @@ const express = require("express");
 const app = express();
 const dogRouter = require("./routes/dogs");
 require("express-async-errors");
+
+//load env vars in second way
+// require("dotenv").config();
+
 app.use(express.json());
 app.use("/static", express.static("assets"));
+// test env's implemented in 3 ways
+console.log("API", process.env.API_KEY); //works
+console.log(process.env.NODE_ENV); //works
 //logger middleware
 
 app.use((req, res, next) => {
@@ -50,10 +57,12 @@ app.use("/*", (req, res, next) => {
 
 // error handlers
 app.use((err, req, res, next) => {
+	console.log(err.message);
 	res.status(err.statusCode || 500).json({
 		Error: {
 			message: err.message,
 			statusCode: err.statusCode || 500,
+			stack: err.stack,
 		},
 	});
 });
