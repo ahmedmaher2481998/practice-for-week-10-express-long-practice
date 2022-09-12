@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const dogRouter = require("./routes/dogs");
 require("express-async-errors");
 app.use(express.json());
 app.use("/static", express.static("assets"));
@@ -17,6 +18,8 @@ app.use((req, res, next) => {
 // Why do you not see the method and URL path logged to the terminal if you make a request to a static asset route?
 //--------------answer---------------
 // because it matches the route in the above middleware ans sends the respond before it reaches the logger middleware
+
+app.use("/dogs", dogRouter);
 
 // For te`sting purposes, GET /
 app.get("/", (req, res) => {
@@ -38,6 +41,7 @@ app.get("/test-error", async (req, res) => {
 	throw new Error("Hello World!");
 });
 
+// -------------------End  of Routes
 app.use("/*", (req, res, next) => {
 	const err = new Error("Not Found !!");
 	err.statusCode = 404;
