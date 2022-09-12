@@ -3,6 +3,21 @@ const app = express();
 require("express-async-errors");
 app.use(express.json());
 app.use("/static", express.static("assets"));
+//logger middleware
+
+app.use((req, res, next) => {
+	console.clear();
+	console.log(`* A ${req.method} to: ${req.originalUrl}`);
+	res.addListener("finish", (...rest) => {
+		console.log("Status :" + res.statusCode);
+	});
+	next();
+});
+
+// Why do you not see the method and URL path logged to the terminal if you make a request to a static asset route?
+//--------------answer---------------
+// because it matches the route in the above middleware ans sends the respond before it reaches the logger middleware
+
 // For te`sting purposes, GET /
 app.get("/", (req, res) => {
 	res.json(
@@ -23,11 +38,19 @@ app.get("/test-error", async (req, res) => {
 	throw new Error("Hello World!");
 });
 
+app.use("/*", (req, res, next) => {
+	const err = new Error("Not Found !!");
+	err.statusCode = 404;
+	throw err;
+});
+
+// error handlers
 app.use((err, req, res, next) => {
 	res.status(err.statusCode || 500).json({
-		Title: "Error Has Ocurred",
-		message: err.message,
-		statusCode: err.statusCode || 500,
+		Error: {
+			message: err.message,
+			statusCode: err.statusCode || 500,
+		},
 	});
 });
 
